@@ -1,0 +1,61 @@
+# Wireless Sensor Network Configuration
+
+# Network Parameters
+network:
+  num_nodes: 100                    # Number of sensor nodes
+  area_width: 100                   # Deployment area width (meters)
+  area_height: 100                  # Deployment area height (meters)
+  base_station_x: 50               # Base station X coordinate
+  base_station_y: 150              # Base station Y coordinate
+  deployment_strategy: random       # Options: random, grid, cluster
+
+# Energy Parameters
+energy:
+  initial_energy: 0.5              # Initial energy per node (Joules)
+  E_elec: 50e-9                    # Electronics energy (J/bit)
+  E_fs: 10e-12                     # Free space amplifier (J/bit/m^2)
+  E_mp: 0.0013e-12                 # Multi-path amplifier (J/bit/m^4)
+  E_DA: 5e-9                       # Data aggregation energy (J/bit)
+  d0: 87.7                         # Crossover distance (m)
+  packet_size: 4000                # Packet size (bits)
+
+# LEACH Protocol Parameters
+leach:
+  cluster_head_probability: 0.05   # Desired CH percentage (5%)
+  round_time: 20                   # Round duration (seconds)
+
+# Simulation Parameters
+simulation:
+  max_rounds: 2000                 # Maximum simulation rounds
+  random_seed: 42                  # Random seed for reproducibility
+  verbose: true                    # Print detailed logs
+  save_results: true               # Save results to file
+  output_directory: ./results      # Output directory for results
+
+# Visualization Parameters
+visualization:
+  plot_topology: true              # Plot network topology
+  plot_energy: true                # Plot energy distribution
+  plot_metrics: true               # Plot performance metrics
+  show_clusters: true              # Show cluster formation
+  show_connections: true           # Show communication links
+  animation: false                 # Enable animation (slow)
+  dpi: 300                         # Figure resolution
+
+# Routing Parameters
+routing:
+  max_hop_distance: 30             # Maximum single hop distance (m)
+  routing_strategy: cluster        # Options: direct, multihop, cluster, adaptive
+  distance_threshold: 50           # Threshold for adaptive routing (m)
+
+# Sensing Parameters
+sensing:
+  sensing_range: 10                # Node sensing range (m)
+  sensing_interval: 1              # Sensing interval (seconds)
+
+# Performance Analysis
+analysis:
+  calculate_coverage: true         # Calculate network coverage
+  calculate_connectivity: true     # Calculate network connectivity
+  export_csv: true                # Export results to CSV
+  export_json: true               # Export results to JSON

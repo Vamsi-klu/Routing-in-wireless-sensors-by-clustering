@@ -1,0 +1,21 @@
+# Core dependencies for WSN Routing Simulation
+
+# Numerical computing
+numpy>=1.21.0
+
+# Visualization
+matplotlib>=3.4.0
+
+# Configuration management
+PyYAML>=5.4.0
+
+# Optional: Advanced analysis
+scipy>=1.7.0
+pandas>=1.3.0
+
+# Optional: Network analysis
+networkx>=2.6.0
+
+# Development dependencies (optional)
+pytest>=6.2.0
+pytest-cov>=2.12.0
