@@ -28,11 +28,13 @@ def run_basic_simulation():
         area_size=(100, 100),
         base_station=(50, 150),
         initial_energy=0.5,
-        deployment='random'
+        deployment='random',
+        random_seed=42  # For reproducible results
     )
     print(f"   Created network with {network.num_nodes} nodes")
     print(f"   Deployment area: {network.area_width}x{network.area_height} meters")
     print(f"   Base station at: {network.base_station}")
+    print(f"   Random seed: {network.random_seed} (for reproducibility)")
 
     # Initialize LEACH
     print("\n2. Initializing LEACH protocol...")

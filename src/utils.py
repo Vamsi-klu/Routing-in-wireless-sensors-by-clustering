@@ -68,13 +68,24 @@ def save_simulation_results(results, filename=None):
 
     Returns:
         Path to saved file
+
+    Raises:
+        IOError: If file cannot be written
+        TypeError: If results cannot be serialized to JSON
     """
     if filename is None:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         filename = f"simulation_results_{timestamp}.json"
 
-    with open(filename, 'w') as f:
-        json.dump(results, f, indent=2)
+    try:
+        with open(filename, 'w') as f:
+            json.dump(results, f, indent=2)
+    except IOError as e:
+        raise IOError(f"Failed to save results to {filename}: {e}")
+    except TypeError as e:
+        raise TypeError(f"Results contain non-serializable data: {e}")
+    except Exception as e:
+        raise Exception(f"Unexpected error saving results to {filename}: {e}")
 
     return filename
 
@@ -87,19 +98,31 @@ def export_to_csv(data, filename, headers=None):
         data: List of dictionaries or list of lists
         filename: Output CSV filename
         headers: List of column headers (optional)
+
+    Raises:
+        ValueError: If data is empty or invalid
+        IOError: If file cannot be written
     """
-    with open(filename, 'w', newline='') as f:
-        if isinstance(data[0], dict):
-            # Data is list of dictionaries
-            writer = csv.DictWriter(f, fieldnames=headers or data[0].keys())
-            writer.writeheader()
-            writer.writerows(data)
-        else:
-            # Data is list of lists
-            writer = csv.writer(f)
-            if headers:
-                writer.writerow(headers)
-            writer.writerows(data)
+    if not data:
+        raise ValueError("Cannot export empty data to CSV")
+
+    try:
+        with open(filename, 'w', newline='') as f:
+            if isinstance(data[0], dict):
+                # Data is list of dictionaries
+                writer = csv.DictWriter(f, fieldnames=headers or data[0].keys())
+                writer.writeheader()
+                writer.writerows(data)
+            else:
+                # Data is list of lists
+                writer = csv.writer(f)
+                if headers:
+                    writer.writerow(headers)
+                writer.writerows(data)
+    except IOError as e:
+        raise IOError(f"Failed to write CSV to {filename}: {e}")
+    except Exception as e:
+        raise Exception(f"Unexpected error exporting to CSV {filename}: {e}")
 
 
 def calculate_energy_efficiency(total_packets, total_energy_consumed):
@@ -111,10 +134,10 @@ def calculate_energy_efficiency(total_packets, total_energy_consumed):
         total_energy_consumed: Total energy consumed (Joules)
 
     Returns:
-        Packets per Joule
+        Packets per Joule (returns 0 if no energy consumed)
     """
     if total_energy_consumed == 0:
-        return 0
+        return 0  # Avoid division by zero
     return total_packets / total_energy_consumed
 
 
@@ -200,15 +223,21 @@ class SimulationLogger:
         Args:
             log_file: Path to log file (optional)
             verbose: Print to console if True
+
+        Raises:
+            IOError: If log file cannot be created
         """
         self.log_file = log_file
         self.verbose = verbose
         self.logs = []
 
         if self.log_file:
-            with open(self.log_file, 'w') as f:
-                f.write(f"Simulation Log - Started at {datetime.now()}\n")
-                f.write("="*60 + "\n\n")
+            try:
+                with open(self.log_file, 'w') as f:
+                    f.write(f"Simulation Log - Started at {datetime.now()}\n")
+                    f.write("="*60 + "\n\n")
+            except IOError as e:
+                raise IOError(f"Failed to create log file {self.log_file}: {e}")
 
     def log(self, message, level="INFO"):
         """
@@ -217,6 +246,10 @@ class SimulationLogger:
         Args:
             message: Message to log
             level: Log level (INFO, WARNING, ERROR)
+
+        Note:
+            File write errors are silently ignored to prevent log failures
+            from disrupting the simulation.
         """
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         log_entry = f"[{timestamp}] [{level}] {message}"
@@ -227,8 +260,13 @@ class SimulationLogger:
             print(log_entry)
 
         if self.log_file:
-            with open(self.log_file, 'a') as f:
-                f.write(log_entry + "\n")
+            try:
+                with open(self.log_file, 'a') as f:
+                    f.write(log_entry + "\n")
+            except IOError:
+                # Silently ignore file write errors to prevent
+                # logging from disrupting the simulation
+                pass
 
     def info(self, message):
         """Log info message"""

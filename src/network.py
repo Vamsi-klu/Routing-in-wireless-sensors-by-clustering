@@ -25,7 +25,8 @@ class WirelessSensorNetwork:
                  base_station=(50, 150),
                  initial_energy=0.5,
                  energy_model=None,
-                 deployment='random'):
+                 deployment='random',
+                 random_seed=None):
         """
         Initialize wireless sensor network.
 
@@ -36,13 +37,52 @@ class WirelessSensorNetwork:
             initial_energy: Initial energy per node in Joules
             energy_model: Energy model to use (default: creates new EnergyModel)
             deployment: Deployment strategy ('random', 'grid', 'cluster')
+            random_seed: Random seed for reproducibility (default: None for random behavior)
+
+        Raises:
+            ValueError: If parameters are invalid
+            TypeError: If parameters have incorrect types
         """
+        # Validate num_nodes
+        if not isinstance(num_nodes, int):
+            raise TypeError("num_nodes must be an integer")
+        if num_nodes <= 0:
+            raise ValueError("num_nodes must be positive")
+
+        # Validate area_size
+        if not isinstance(area_size, tuple) or len(area_size) != 2:
+            raise ValueError("area_size must be a tuple of (width, height)")
+        if area_size[0] <= 0 or area_size[1] <= 0:
+            raise ValueError("area dimensions must be positive")
+
+        # Validate base_station
+        if not isinstance(base_station, tuple) or len(base_station) != 2:
+            raise ValueError("base_station must be a tuple of (x, y) coordinates")
+
+        # Validate initial_energy
+        if initial_energy < 0:
+            raise ValueError("initial_energy cannot be negative")
+
+        # Validate deployment strategy
+        valid_deployments = ['random', 'grid', 'cluster']
+        if deployment not in valid_deployments:
+            raise ValueError(
+                f"Unknown deployment strategy: '{deployment}'. "
+                f"Valid options are: {', '.join(valid_deployments)}"
+            )
+
         self.num_nodes = num_nodes
         self.area_width, self.area_height = area_size
         self.base_station = base_station
         self.initial_energy = initial_energy
         self.energy_model = energy_model or EnergyModel()
         self.deployment = deployment
+        self.random_seed = random_seed
+
+        # Set random seed for reproducibility
+        if random_seed is not None:
+            random.seed(random_seed)
+            np.random.seed(random_seed)
 
         # Network state
         self.nodes = []
@@ -65,7 +105,12 @@ class WirelessSensorNetwork:
         elif self.deployment == 'cluster':
             self._cluster_deployment()
         else:
-            raise ValueError(f"Unknown deployment strategy: {self.deployment}")
+            # This should not happen due to validation in __init__
+            valid_deployments = ['random', 'grid', 'cluster']
+            raise ValueError(
+                f"Unknown deployment strategy: '{self.deployment}'. "
+                f"Valid options are: {', '.join(valid_deployments)}"
+            )
 
     def _random_deployment(self):
         """Randomly deploy nodes in the area"""
