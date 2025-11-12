@@ -266,14 +266,20 @@ class WirelessSensorNetwork:
 
     def reset(self):
         """Reset network to initial state"""
+        from src.node import NodeState
+
         for node in self.nodes:
             node.energy = node.initial_energy
-            node.state = NodeType.NORMAL
+            node.state = NodeState.ACTIVE
+            node.node_type = NodeType.NORMAL
             node.packets_sent = 0
             node.packets_received = 0
             node.is_cluster_head = False
             node.cluster_head = None
             node.cluster_members = []
+            node.ch_rounds = 0
+            node.last_ch_round = -1
+            node.round = 0
 
         self.current_round = 0
         self.first_node_death_round = None
