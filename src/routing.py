@@ -101,15 +101,17 @@ class MultiHopRouter(Router):
         Returns:
             List of nodes forming the path, or None if no path exists
         """
-        # Priority queue: (cost, current_node, path)
-        pq = [(0, source, [source])]
+        # Priority queue: (cost, counter, current_node, path)
+        # Counter breaks ties when costs are equal
+        counter = 0
+        pq = [(0, counter, source, [source])]
         visited = set()
         min_cost = {source.id: 0}
 
         dest_x, dest_y = destination if isinstance(destination, tuple) else (destination.x, destination.y)
 
         while pq:
-            cost, current, path = heapq.heappop(pq)
+            cost, _, current, path = heapq.heappop(pq)
 
             if current.id in visited:
                 continue
@@ -137,7 +139,8 @@ class MultiHopRouter(Router):
 
                     if neighbor.id not in min_cost or total_cost < min_cost[neighbor.id]:
                         min_cost[neighbor.id] = total_cost
-                        heapq.heappush(pq, (total_cost, neighbor, path + [neighbor]))
+                        counter += 1
+                        heapq.heappush(pq, (total_cost, counter, neighbor, path + [neighbor]))
 
         return None  # No path found
 

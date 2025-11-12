@@ -120,8 +120,13 @@ class WirelessSensorNetwork:
         ]
 
         node_id = 0
-        for center_x, center_y in cluster_centers:
-            for _ in range(nodes_per_cluster):
+        for idx, (center_x, center_y) in enumerate(cluster_centers):
+            # Add extra nodes to last cluster to handle remainder
+            nodes_to_place = nodes_per_cluster
+            if idx == len(cluster_centers) - 1:
+                nodes_to_place = self.num_nodes - node_id  # Place all remaining nodes
+
+            for _ in range(nodes_to_place):
                 if node_id >= self.num_nodes:
                     break
                 # Add Gaussian noise around cluster center

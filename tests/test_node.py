@@ -434,7 +434,7 @@ class TestSensing:
 
     def test_failed_sensing_insufficient_energy(self):
         """Test sensing fails with insufficient energy"""
-        node = SensorNode(0, 0, 0, 0.00000001)
+        node = SensorNode(0, 0, 0, 0.000000001)  # 1e-9, less than sensing energy (1e-8)
 
         result = node.sense()
 
